@@ -18,14 +18,12 @@ const additionalTimezones = [
   "Europe/London",
   "Europe/Vilnius",
 ];
-
+const newRulePrefix = "[ITCC]"
 export default class NewRule extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoading: false,
-    };
-    this.state = {
       newRuleName: null,
       newRuleCreated: false,
       newRuleCR: null,
@@ -136,10 +134,10 @@ export default class NewRule extends React.Component {
             rule: {
               name: "${
                 hostList.length > batchLimit
-                  ? this.state.newRuleName +
+                  ? newRulePrefix + this.state.newRuleName +
                     " - batch " +
                     (index + 1).toString()
-                  : this.state.newRuleName
+                  : newRulePrefix + this.state.newRuleName
               }"
               description: "${this.state.newRuleCR}"
               enabled: true
@@ -216,6 +214,7 @@ export default class NewRule extends React.Component {
         ) : (
           ""
         )}
+        <h3>Create new rule</h3>
         <table>
           <tr>
             <td>Rule Name</td>

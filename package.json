@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "ab-muting-rules",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "scripts": {
         "start": "nr1 nerdpack:serve",
         "test": "exit 0"
@@ -10,6 +10,7 @@
         "uuid": "05131821-a215-426d-9d6a-52e631a9e5e5"
     },
     "dependencies": {
+        "moment": "^2.29.1",
         "prop-types": "15.7.2",
         "react": "17.0.2",
         "react-datepicker": "^4.6.0",

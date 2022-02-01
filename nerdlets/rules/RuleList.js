@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Icon, NerdGraphQuery, Modal } from "nr1";
+import { Button, Icon, NerdGraphQuery, Modal, NerdGraphMutation } from "nr1";
 import RuleDetails from "./RuleDetails";
 const accountId = 3112341;
 export default class RuleList extends React.Component {
@@ -9,9 +9,14 @@ export default class RuleList extends React.Component {
       selectedRuleId: null,
       ruleDetailsHidden: true,
       ruleDetails: null,
+      ruleDeleteHidden: true,
+      ruleDeleteId: null,
+      errorMessage: null
     };
     this.openRuleDetails = this.openRuleDetails.bind(this);
     this.closeRuleDetails = this.closeRuleDetails.bind(this);
+    this.closeRuleDelete = this.closeRuleDelete.bind(this);
+    this.openRuleDelete = this.openRuleDelete.bind(this);
   }
 
   openRuleDetails(ruleId) {
@@ -59,9 +64,39 @@ export default class RuleList extends React.Component {
     this.setState({ ruleDetailsHidden: false });
   }
 
+  openRuleDelete(id) {
+    this.setState({ ruleDeleteHidden: false });
+    this.setState({ ruleDeleteId: id });
+  }
+
+  closeRuleDelete() {
+    this.setState({ ruleDeleteHidden: true });
+  }
+
   closeRuleDetails() {
     this.setState({ ruleDetailsHidden: true, ruleDetails: null });
   }
+
+deleteRule(id) {
+  const mutateQuery =`
+  mutation {
+    alertsMutingRuleDelete(accountId: ${accountId}, id: ${id}) {
+      id
+    }
+  }
+  `
+  console.log(mutateQuery)
+  this.setState({ errorMessage: null });
+  NerdGraphMutation.mutate({
+    mutation: mutateQuery,
+  }).catch((error) => {
+    console.log("Nerdgraph Error:", error);
+    this.setState({ errorMessage: error });
+  });
+  this.setState({
+    ruleDeleteHidden: true
+  });
+}
 
   render() {
     if (this.props.ruleData != null) {
@@ -98,7 +133,15 @@ export default class RuleList extends React.Component {
                       type={Button.TYPE.OUTLINE}
                       onClick={() => this.openRuleDetails(d.id)}
                     >
-                      <Icon type={Icon.TYPE.INTERFACE__OPERATIONS__SHOW}></Icon>
+                      <Icon type={Icon.TYPE.INTERFACE__OPERATIONS__EDIT}></Icon>
+                    </Button>
+                    <Button
+                      type={Button.TYPE.OUTLINE}
+                      onClick={() => this.openRuleDelete(d.id)}
+                    >
+                      <Icon
+                        type={Icon.TYPE.INTERFACE__OPERATIONS__TRASH}
+                      ></Icon>
                     </Button>
                   </td>
                   <td>{d.name}</td>
@@ -122,6 +165,27 @@ export default class RuleList extends React.Component {
               />
             </div>
           </Modal>
+          <div>
+            {" "}
+            <Modal
+              name="ruleDelete"
+              hidden={this.state.ruleDeleteHidden}
+              onClose={() => this.closeRuleDelete()}
+            >
+              <div>
+                <h3>Confirm rule {this.state.ruleDeleteId} deletion.</h3>
+                <p >Attention! This action is not undoable and will immediately re-enable alerting on all muted entities. To cancel, click outside</p>
+                <Button style={{marginTop: "20px"}}
+                  type={Button.TYPE.DESTRUCTIVE}
+                  onClick={() => this.deleteRule(this.state.ruleDeleteId)}
+                >
+                  <Icon type={Icon.TYPE.INTERFACE__OPERATIONS__TRASH}></Icon>
+                  &nbsp;Confirm
+                </Button>
+                &nbsp;
+              </div>
+            </Modal>
+          </div>
         </div>
       );
     } else {
